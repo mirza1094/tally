@@ -52,7 +52,9 @@
   --tip:rgba(44,46,60,.97); --scrim:rgba(0,0,0,.5); --sheet:rgba(28,30,40,.95); color-scheme:dark }
 
 .ty,.ty *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 var(--font);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
+body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 var(--font);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overflow-x:clip}
+html{overflow-x:clip}
+@supports not (overflow:clip){body{overflow-x:hidden}}
 body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:
   radial-gradient(60% 50% at 8% 0%,var(--mesh1),transparent 70%),
   radial-gradient(50% 45% at 100% 8%,var(--mesh2),transparent 70%),
@@ -194,12 +196,18 @@ button.row + button.row{border-top-color:transparent}
 .btn-row{display:flex;flex-wrap:wrap;gap:10px}
 .field{display:flex;flex-direction:column;gap:6px;min-width:0}
 .field label,.label{font-size:12.5px;font-weight:620;color:var(--fg3)}
-.input{height:44px;border-radius:13px;border:1px solid var(--hair);background:var(--glass-soft);padding:0 13px;width:100%;min-width:0;outline:none}
+.input{height:44px;border-radius:13px;border:1px solid var(--hair);background:var(--glass-soft);padding:0 13px;width:100%;min-width:0;max-width:100%;outline:none}
+/* Safari gives date fields a fixed minimum width unless their native look is turned off. */
+.input[type=date]{-webkit-appearance:none;appearance:none;display:block;line-height:42px;text-align:left}
+.input[type=date]::-webkit-date-and-time-value{text-align:left;margin:0}
+.two>*{min-width:0}
 .input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 .two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.amount-in{display:flex;align-items:baseline;justify-content:center;gap:4px;padding:6px 0 2px}
+.amount-in{position:relative;overflow:hidden;display:flex;align-items:baseline;justify-content:center;gap:2px;padding:6px 0 2px}
+.amount-in input:focus-visible{outline:none}
+.amt-measure{position:absolute;left:0;top:0;visibility:hidden;white-space:pre;pointer-events:none}
 .amount-in span{font:600 28px var(--round);color:var(--fg3)}
-.amount-in input{font:700 46px var(--round);letter-spacing:-.02em;width:4.2ch;max-width:78%;border:0;background:none;outline:none;text-align:center;font-variant-numeric:tabular-nums}
+.amount-in input{font:700 46px var(--round);letter-spacing:-.02em;width:3.2em;max-width:82%;padding:0;border:0;background:none;outline:none;text-align:left;font-variant-numeric:tabular-nums}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
 .chip{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:999px;background:var(--fill);font-size:13.5px;font-weight:550;white-space:nowrap}
 .chip[aria-pressed="true"]{background:var(--chip,var(--accent));color:#fff}
@@ -214,10 +222,11 @@ button.row + button.row{border-top-color:transparent}
 .swatches button{width:30px;height:30px;border-radius:50%;border:3px solid transparent;background-clip:padding-box}
 .swatches button[aria-pressed="true"]{border-color:var(--fg)}
 .note{font-size:12.5px;color:var(--fg3);line-height:1.45}
+.banner.warn{background:rgba(255,159,10,.16)}
 .banner{border-radius:var(--r-md);padding:11px 14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;font-size:13.5px;background:var(--accent-soft);color:var(--fg)}
 
 /* tab bar (phone) */
-.tabbar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;align-items:center;gap:2px;padding:7px;border-radius:999px;box-shadow:var(--shadow-lift)}
+.tabbar{position:fixed;left:0;right:0;margin:0 auto;width:max-content;max-width:calc(100% - 24px);bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:20;display:flex;align-items:center;gap:2px;padding:7px;border-radius:999px;box-shadow:var(--shadow-lift)}
 .tab{width:58px;height:48px;border-radius:999px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--fg3);font-size:10px;font-weight:600}
 .tab svg{width:21px;height:21px}
 .tab[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
@@ -227,7 +236,7 @@ button.row + button.row{border-top-color:transparent}
 /* sheets */
 .scrim{position:fixed;inset:0;z-index:40;background:var(--scrim);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center}
 .sheet>*{flex-shrink:0}
-.sheet{width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:var(--r-xl) var(--r-xl) 0 0;background:var(--sheet);border:1px solid var(--stroke);box-shadow:var(--shadow-lift);
+.sheet{width:100%;max-width:560px;max-height:92%;overflow-y:auto;overflow-x:hidden;border-radius:var(--r-xl) var(--r-xl) 0 0;background:var(--sheet);border:1px solid var(--stroke);box-shadow:var(--shadow-lift);
   -webkit-backdrop-filter:blur(40px) saturate(180%);backdrop-filter:blur(40px) saturate(180%);padding:10px 18px calc(22px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:16px;overscroll-behavior:contain}
 @media (min-width:700px){.scrim{align-items:center;padding:24px}.sheet{border-radius:var(--r-xl);max-height:88%;padding-bottom:22px}.grab{display:none}}
 .grab{width:38px;height:5px;border-radius:99px;background:var(--fill-strong);margin:0 auto}
@@ -235,7 +244,7 @@ button.row + button.row{border-top-color:transparent}
 .sheet-title{font:700 20px var(--round);letter-spacing:-.01em}
 .x{width:32px;height:32px;border-radius:50%;background:var(--fill);display:grid;place-items:center;color:var(--fg2);flex:none}
 .x svg{width:14px;height:14px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:60;padding:11px 18px;border-radius:999px;font-size:13.5px;font-weight:600;max-width:min(92vw,460px);text-align:center;background:var(--glass-strong)}
+.toast{position:fixed;left:16px;right:16px;margin:0 auto;width:max-content;bottom:calc(96px + env(safe-area-inset-bottom,0px));z-index:60;padding:11px 18px;border-radius:999px;font-size:13.5px;font-weight:600;max-width:min(calc(100% - 32px),460px);text-align:center;background:var(--glass-strong)}
 @media (min-width:960px){.toast{bottom:28px}}
 .drop{position:fixed;inset:12px;z-index:70;border-radius:var(--r-xl);border:2.5px dashed var(--accent);background:var(--accent-soft);display:grid;place-items:center;font:700 22px var(--round);color:var(--accent);pointer-events:none}
 .welcome{align-items:center;text-align:center;padding:38px 22px;gap:18px}
@@ -368,13 +377,15 @@ const CATALOG={
  /* These three are not spending. They feed the money in and out view only. */
  income:{name:'Income',emoji:'💵',color:'#2FA84F',kind:'income',subs:['Paycheck','Interest','Refunds & reimbursements','Other income']},
  investing:{name:'Investing',emoji:'📈',color:'#00A3A3',kind:'invest',subs:['Brokerage','Retirement','Savings']},
- transfers:{name:'Transfers',emoji:'🔄',color:'#8E8E93',kind:'transfer',subs:['Card payment','Between accounts']},
+ transfers:{name:'Transfers',emoji:'🔄',color:'#8E8E93',kind:'transfer',subs:['Card payment','Between accounts','Balance transfer']},
 };
 const kindOfCat=id=>(CATALOG[id]||{}).kind||'spend';
 const PALETTE=['#007AFF','#34C759','#FF9500','#FF2D55','#5856D6','#30B0C7','#AF52DE','#FF3B30','#A2845E','#00B8AE','#E0A800','#32ADE6','#BF5AF2','#FF6482','#8E8E93'];
 
 /* Merchant patterns: [pattern, category id, subcategory]. First match wins, so specific entries come first. */
 const DICT=[
+ [/BALANCE TRANSFER FEE|BAL(ANCE)? TRANSFER FEE|\bBT FEE|TRANSFER FEE/,'taxes','Bank fees & interest'],
+ [/BALANCE TRANSFER|BAL TRANSFER|BAL XFER/,'transfers','Balance transfer'],
  [/US TREAS|\bIRS\b|TAX PYMT|TURBOTAX|H&R BLOCK/,'taxes','Taxes'],
  [/BUREAU MOTOR|\bBMV\b|\bDMV\b|PASSPORT|CLERK OF COURT/,'taxes','Government'],
  [/\bPLC\b|\bLLP\b|LAW OFFICE|ATTORNEY|NOTARY/,'taxes','Legal & professional'],
@@ -509,6 +520,7 @@ function load(){try{const j=JSON.parse(localStorage.getItem(KEY)||'null');if(j&&
   if(!Array.isArray(S.cards))S.cards=[];
   if(!Array.isArray(S.marks))S.marks=[];
   const moved=normalizeAccounts(),boot=!S.settings.marksInit&&bootstrapMarks();
+  if(!S.settings.fix2){fixBlankRows();S.settings.fix2=1;saveLocal()}
   if(moved||boot)saveLocal();
 }
 function saveLocal(){LIVE=null;try{localStorage.setItem(KEY,JSON.stringify(S));return true}catch(e){toast('Could not save on this device. Export a backup from Settings.');return false}}
@@ -543,6 +555,27 @@ function catIdForName(name){
 /* Well-known issuers and banks, so "Amex Blue Cash" in a file finds your "American Express" account. */
 const ISSUERS=[/apple/i,/amex|american express|blue cash/i,/capital ?one/i,/discover/i,/wells ?fargo/i,/chase/i,/\bciti/i,/bank of america|\bbofa\b/i,/huntington/i,/\bpnc\b/i,/u\.?s\.? ?bank/i,/fifth third/i,/key ?bank/i,/ally/i,/sofi/i];
 const cards=()=>S.cards.filter(c=>!c.x);
+/* Card numbers are remembered as "#1234" hints, so a statement finds its account by the last four digits. */
+const accByNum=n=>n?cards().find(c=>(c.hints||[]).includes('#'+n))||null:null;
+function addHint(c,h){const L=(c.hints||[]).filter(x=>x!==h);L.push(h);c.hints=[...L.filter(x=>x[0]==='#'),...L.filter(x=>x[0]!=='#').slice(-6)];c.u=Date.now()}
+/* Same date, amount and description: the test for one charge saved under two accounts. */
+const dupKey=(d,amt,raw,m)=>d+'|'+Number(amt).toFixed(2)+'|'+mkey(raw||m);
+/* A blank-description charge with a 3, 4 or 5 percent companion on the same day is a balance transfer and its fee. */
+function pairTransfers(list,get){
+  const out=new Map();
+  for(const f of list)for(const b of list){if(f===b||out.has(f)||out.has(b))continue;const A=get(b),F=get(f);
+    if(A.d===F.d&&A.a>F.a&&[.03,.04,.05].some(pc=>Math.abs(Math.round(A.a*pc*100)/100-F.a)<=.01)){out.set(b,'bt');out.set(f,'fee')}}
+  return out;
+}
+function fixBlankRows(){
+  let n=0;const L=S.tx.filter(t=>!t.x&&t.src==='import'&&!t.raw&&t.a>0),by=new Map();
+  for(const t of L){const k=t.acc+'|'+t.d;(by.get(k)||by.set(k,[]).get(k)).push(t)}
+  for(const g of by.values())for(const [t,role] of pairTransfers(g,x=>x)){
+    if(role==='bt'){t.m='Balance transfer';applyCat(t,'transfers','Balance transfer')}else{t.m='Balance transfer fee';applyCat(t,'taxes','Bank fees & interest')}
+    t.u=Date.now();n++}
+  for(const t of L)if(t.m==='Unknown'){t.m='No description';t.u=Date.now();n++}
+  return n;
+}
 function matchCard(name){
   const s=String(name||'').toLowerCase().trim();if(!s)return null;const L=cards();
   const exact=L.find(c=>c.name.toLowerCase()===s);if(exact)return exact;
@@ -703,7 +736,10 @@ async function parseFile(file,hint){
   const fname=file.name.replace(/\.[^.]+$/,'').replace(/[_\-]+/g,' ').replace(/\s+/g,' ').trim().slice(0,28);
   const hc=hint?cards().find(c=>c.name===hint):null,iss=n=>ISSUERS.findIndex(r=>r.test(n));
   const fh=fileHint(file.name),byFile=fh.length>=8?cards().find(c=>(c.hints||[]).includes(fh)):null;
-  const card=hc&&(!account||iss(hc.name)===iss(account))?hc:(matchCard(account)||byFile||matchCard(fname)||hc);
+  /* Capital One's layout is also used for other cards it services (Discover), so the card number decides. */
+  const nums=ci.card>=0?[...new Set(body.map(r=>String(r[ci.card]??'').trim()).filter(Boolean))]:[];
+  const weak=/^Capital One ••/.test(account),byNum=accByNum(nums[0]);
+  const card=(hc&&account&&!weak&&iss(hc.name)===iss(account)?hc:null)||(!weak&&account?matchCard(account):null)||byNum||hc||matchCard(account)||byFile||matchCard(fname);
   const detected=account||fname;account=card?card.name:detected;
   const own=ci.sub>=0&&ci.cat>=0;
   const tmp=[];
@@ -714,7 +750,7 @@ async function parseFile(file,hint){
     else{const db=parseAmount(r[ci.debit]),cr=ci.credit>=0?parseAmount(r[ci.credit]):null;a=db!=null&&db!==0?Math.abs(db):(cr!=null?-Math.abs(cr):null)}
     if(a==null||a===0)continue;
     const raw=String(r[ci.desc]??'').trim();
-    tmp.push({d,a,raw,mraw:ci.merch>=0?String(r[ci.merch]).trim():'',bank:ci.cat>=0?String(r[ci.cat]).trim():'',type:ci.type>=0?String(r[ci.type]):'',
+    tmp.push({d,a,raw,num:ci.card>=0?String(r[ci.card]??'').trim():'',mraw:ci.merch>=0?String(r[ci.merch]).trim():'',bank:ci.cat>=0?String(r[ci.cat]).trim():'',type:ci.type>=0?String(r[ci.type]):'',
       acc:ci.acc>=0?String(r[ci.acc]).trim():'',sub:own?String(r[ci.sub]).trim():'',note:ci.note>=0?String(r[ci.note]).trim():''});
   }
   /* Unsigned amounts with a Debit/Credit column: make the credits negative. */
@@ -727,9 +763,9 @@ async function parseFile(file,hint){
   const nonPay=tmp.filter(t=>!/PAYMENT|PYMT|THANK ?YOU|TRANSFER|DEPOSIT/i.test(t.raw));
   const flipped=!typed&&ci.amt>=0&&!own&&nonPay.filter(t=>t.a<0).length>nonPay.filter(t=>t.a>0).length;
   if(flipped)tmp.forEach(t=>t.a=-t.a);
-  const rows=tmp.map(t=>({d:t.d,a:Math.round(t.a*100)/100,raw:t.raw,mraw:t.mraw,bank:own?'':t.bank,type:t.type,acc:t.acc,cat:own?t.bank:'',sub:t.sub,note:t.note}));
+  const rows=tmp.map(t=>({d:t.d,a:Math.round(t.a*100)/100,raw:t.raw,num:t.num,mraw:t.mraw,bank:own?'':t.bank,type:t.type,acc:t.acc,cat:own?t.bank:'',sub:t.sub,note:t.note}));
   let min='',max='';for(const t of tmp){if(!min||t.d<min)min=t.d;if(!max||t.d>max)max=t.d}
-  return {name:file.name,account,detected,rows,own,min,max,bankLike:flipped||typed,hint:account===detected||byFile||!card?fh:''};
+  return {name:file.name,account,detected,rows,own,nums,min,max,bankLike:flipped||typed,hint:account===detected||byFile||!card?fh:''};
 }
 function txKey(acc,r){return [mkey(acc),r.d,r.a.toFixed(2),mkey(r.raw||r.m)].join('|')}
 /* Builds new transactions from parsed files. Skips anything already stored, and pairs a bank row with an
@@ -737,27 +773,38 @@ function txKey(acc,r){return [mkey(acc),r.d,r.a.toFixed(2),mkey(r.raw||r.m)].joi
 function stage(parsed){
   const have=new Set(S.tx.filter(t=>!t.x&&t.k).map(t=>t.k));
   const manual=S.tx.filter(t=>!t.x&&t.src==='manual'&&!t.k),used=new Set();
+  /* Where each charge already lives, to catch one statement saved under two accounts. */
+  const where=new Map(),put=(k,acc)=>(where.get(k)||where.set(k,new Set()).get(k)).add(acc);
+  for(const t of S.tx)if(!t.x&&t.src!=='manual'&&t.src!=='sample')put(dupKey(t.d,t.a,t.raw,t.m),t.acc);
   const out={files:[],tx:[],links:[],parsed};
   for(const p of parsed){
     const acct=cards().find(c=>c.name===p.account);
     /* A card statement drops payments and treats credits as refunds. A bank statement keeps everything. */
     const mode=p.own?'own':acct?(acct.type==='bank'?'bank':'card'):(p.newType||(p.bankLike?'bank':'card'));
-    const seen=new Map();let dup=0,pay=0,add=0,ref=0,link=0,mov=0;
+    const seen=new Map(),xAcc=new Set();let dup=0,pay=0,add=0,ref=0,link=0,mov=0,dupx=0;
+    const bt=mode==='own'?new Map():pairTransfers(p.rows.filter(r=>!(r.mraw||r.raw)&&r.a>0),r=>r);
+    const first=(p.nums||[])[0];
     for(const r of p.rows){
       if(mode==='card'){const kind=kindOf(r.raw,r.a,r.type);if(kind==='payment'||kind==='reward'){pay++;continue}}
-      const acc=r.acc||p.account;let k=txKey(acc,r);const n=(seen.get(k)||0)+1;seen.set(k,n);k+='#'+n;
+      const other=r.num&&r.num!==first?accByNum(r.num):null;
+      const acc=(other&&other.name)||r.acc||p.account;let k=txKey(acc,r);const n=(seen.get(k)||0)+1;seen.set(k,n);k+='#'+n;
       if(have.has(k)){dup++;continue}
-      have.add(k);
+      const role=bt.get(r),blank=!(r.mraw||r.raw);
+      const m=mode==='own'?(r.mraw||r.raw):role==='bt'?'Balance transfer':role==='fee'?'Balance transfer fee':blank?(r.bank?r.bank+' (no description)':'No description'):cleanName(r.mraw||r.raw,mode);
+      const xk=dupKey(r.d,r.a,r.raw,m),xs=where.get(xk);
+      if(xs&&!p.keepX&&[...xs].some(x=>x!==acc)){dupx++;xs.forEach(x=>{if(x!==acc)xAcc.add(x)});continue}
+      have.add(k);put(xk,acc);
       const mine=manual.filter(t=>!used.has(t.id)&&t.a===r.a&&(!t.acc||t.acc===acc)&&Math.abs(dayDiff(t.d,r.d))<=3)
         .sort((x,y)=>Math.abs(dayDiff(x.d,r.d))-Math.abs(dayDiff(y.d,r.d)))[0];
       if(mine){used.add(mine.id);out.links.push({id:mine.id,k,raw:r.raw,acc});link++;continue}
-      const m=mode==='own'?(r.mraw||r.raw):cleanName(r.mraw||r.raw,mode);
       const t={id:uid('t'),d:r.d,a:r.a,m,acc,n:r.note||'',src:'import',raw:r.raw,k,u:Date.now()};
       if(r.cat){t._c=catIdForName(r.cat);t._cn=r.cat;t._s=r.sub}
+      else if(role==='bt'){t._c='transfers';t._s='Balance transfer'}
+      else if(role==='fee'){t._c='taxes';t._s='Bank fees & interest'}
       else{const g=categorize(r.raw,m,r.bank,mode,r.a);t._c=g.c;t._s=g.subName}
       out.tx.push(t);kindOfCat(t._c)!=='spend'?mov++:r.a<0?ref++:add++;
     }
-    out.files.push({name:p.name,account:p.account,add,ref,dup,pay,link,mov,mode,min:p.min,max:p.max,own:p.own,hint:p.hint});
+    out.files.push({name:p.name,account:p.account,add,ref,dup,pay,link,mov,dupx,xAcc:[...xAcc],keepX:!!p.keepX,nums:p.nums||[],mode,min:p.min,max:p.max,own:p.own,hint:p.hint});
   }
   return out;
 }
@@ -766,7 +813,9 @@ function commitStage(st){
   for(const f of st.files){
     if(f.own||!f.account||!f.min)continue;
     const c=cards().find(c=>c.name===f.account)||addCard(f.account,f.mode);
-    if(f.hint&&f.hint.length>=8&&!(c.hints||[]).includes(f.hint)){c.hints=[...(c.hints||[]),f.hint].slice(-6);c.u=Date.now()}
+    if(f.hint&&f.hint.length>=8&&!(c.hints||[]).includes(f.hint))addHint(c,f.hint);
+    /* Remember the card number. Your choice on the review screen moves it from any other account. */
+    f.nums.forEach((n,i)=>{const tag='#'+n,o=accByNum(n);if(o&&o!==c&&i>0)return;for(const x of S.cards)if(x!==c&&(x.hints||[]).includes(tag)){x.hints=x.hints.filter(h=>h!==tag);x.u=Date.now()}if(!(c.hints||[]).includes(tag))addHint(c,tag)});
     /* Every finished month inside the file's date range now counts as uploaded. */
     for(let ym=f.min.slice(0,7),i=0;ym<=f.max.slice(0,7)&&i<240;ym=ymAdd(ym,1),i++)if(ym<now&&!hasMark(c.id,ym))setMark(c.id,ym,'c');
   }
@@ -845,6 +894,15 @@ function remRow({c,months}){
   return `<div class="row"><span class="glyph" style="background:var(--accent-soft)">${c.type==='bank'?'🏦':'💳'}</span><span class="row-main"><span class="row-name">${esc(c.name)}</span><span class="row-sub">${one?ymLabel(lastM)+' has no statement':months.length+' months have no statement, '+ymLabel(months[0])+' to '+ymLabel(lastM)}</span></span>
    <span class="rem-btns">${one?`<button class="btn small" data-act="card-skip" data-id="${esc(c.id+'|'+lastM)}">Not used</button>`:`<button class="btn small" data-act="card" data-id="${esc(c.id)}">Review</button>`}<button class="btn small primary" data-act="card-upload" data-id="${esc(c.id)}">Upload</button></span></div>`;
 }
+function crossDupes(){
+  const g=new Map();
+  for(const t of live()){if(t.src==='manual'||t.src==='sample')continue;const k=dupKey(t.d,t.a,t.raw,t.m);(g.get(k)||g.set(k,[]).get(k)).push(t)}
+  return [...g.values()].filter(a=>new Set(a.map(t=>t.acc)).size>1);
+}
+function dupBanner(){
+  if(S.settings.sample)return '';const n=crossDupes().length;if(!n)return '';
+  return `<div class="banner warn"><span>${n} ${n===1?'charge appears':'charges appear'} under two accounts, so ${n===1?'it is':'they are'} counted twice.</span><button class="link" data-act="dupes">Review</button></div>`;
+}
 function remindCard(){
   const rem=reminders();if(!rem.length)return '';
   return `<section class="card glass remind"><div class="card-head"><h2 class="card-title">Statements to upload</h2><span class="card-sub">${rem.length} ${rem.length===1?'account':'accounts'}</span></div><div class="rows">${rem.map(remRow).join('')}</div></section>`;
@@ -881,7 +939,7 @@ function viewHome(pr){
   CTX={pr,cur,prev,byCat};
   const whole=Math.floor(Math.abs(tot)),centsTxt=(Math.abs(tot)-whole).toFixed(2).slice(1);
   return `${S.settings.sample?`<div class="banner"><span>You are looking at sample data, not your own.</span><button class="link" data-act="clear-sample">Clear sample data</button></div>`:''}
-  ${remindCard()}
+  ${dupBanner()}${remindCard()}
   <div class="grid">
    <section class="card glass hero c8">
      <div class="hero-row"><div><div class="card-sub">Spent in ${esc(pr.label)}</div><div class="big">${tot<0?'-':''}$${whole.toLocaleString('en-US')}<small>${centsTxt}</small></div></div>${deltaChip(tot,ptot,pr.plabel)}</div>
@@ -1097,7 +1155,7 @@ function viewSettings(){
      <div class="field"><label for="sync-pass">Passcode</label><input class="input" id="sync-pass" type="password" autocomplete="off" value="${esc(st.pass)}"></div>
      <div class="btn-row"><button class="btn primary" data-act="sync-save">Save and sync</button></div><div class="note" data-sync-note></div></section>
    <section class="card glass"><h2 class="card-title">Your data</h2><p class="note">${n} expenses are stored on this device. A backup file holds everything: expenses, categories and rules.</p>
-     <div class="btn-row"><button class="btn" data-act="backup">Download backup</button><button class="btn" data-act="csv">Export as CSV</button><button class="btn" data-act="restore">Restore backup</button></div>
+     <div class="btn-row"><button class="btn" data-act="backup">Download backup</button><button class="btn" data-act="csv">Export as CSV</button><button class="btn" data-act="restore">Restore backup</button><button class="btn" data-act="dupes">Find duplicates</button></div>
      <div class="btn-row"><button class="btn danger" data-act="erase">Erase everything</button></div></section>
   </div>`;
 }
@@ -1130,6 +1188,13 @@ function closeSheet(){if($('#scrim').hidden)return;SHEET_CH.forEach(id=>{if(CH[i
 const head=(t,back)=>`<div class="sheet-head">${back?`<button class="link" data-act="${back}">‹ Back</button>`:''}<h2 class="sheet-title">${esc(t)}</h2>${X_BTN}</div>`;
 
 /* add / edit expense */
+/* Sizes the amount field to its text, so it never clips and the $ sits right beside it. */
+function sizeAmount(){
+  const i=$('#f-a');if(!i)return;let m=$('.amt-measure',i.parentNode);
+  if(!m){m=document.createElement('span');m.className='amt-measure';m.setAttribute('aria-hidden','true');i.parentNode.appendChild(m)}
+  const cs=getComputedStyle(i);Object.assign(m.style,{fontFamily:cs.fontFamily,fontSize:cs.fontSize,fontWeight:cs.fontWeight,letterSpacing:cs.letterSpacing,fontVariantNumeric:cs.fontVariantNumeric});
+  m.textContent=i.value||i.placeholder;i.style.width=Math.ceil(m.getBoundingClientRect().width)+6+'px';
+}
 let F=null;
 function txSheet(id){
   const t=id?S.tx.find(x=>x.id===id):null,{last}=bounds();
@@ -1147,7 +1212,7 @@ function txSheet(id){
    <div class="field"><label for="f-n">Note</label><input class="input" id="f-n" autocomplete="off" value="${esc(F.n)}"></div>
    ${t?`<label class="switch"><span>Use this category for every expense from <b>${esc(t.m)}</b></span><input type="checkbox" id="f-rule" checked></label>`:''}
    <div class="btn-row"><button class="btn primary" style="flex:1" data-act="f-save">${t?'Save changes':'Add expense'}</button>${t?'<button class="btn danger" data-act="f-del">Delete</button>':''}</div>`);
-  drawPickers();
+  drawPickers();sizeAmount();
   if(!t&&matchMedia('(min-width:700px)').matches)$('#f-a').focus();
 }
 function drawPickers(addCat,addSub){
@@ -1207,7 +1272,9 @@ function importSheet(){
   st.tx.forEach(t=>byCat.set(t._c,(byCat.get(t._c)||0)+1));
   const unc=byCat.get('other')||0;
   openSheet(`${head('Review import')}
-   ${st.files.map((f,i)=>{const isCard=cards().some(k=>k.name===f.account);return `<div class="stat"><div class="row-name">${esc(f.name)}</div><div class="note">${[f.add+(f.add===1?' expense':' expenses'),f.ref?f.ref+(f.ref===1?' refund':' refunds'):'',f.mov?f.mov+' income, investing and transfer entries':'',f.link?f.link+' matched to expenses you entered by hand':'',f.dup?f.dup+' already imported':'',f.pay?f.pay+' card payments and rewards left out':''].filter(Boolean).join(' · ')}</div>
+   ${st.files.map((f,i)=>{const isCard=cards().some(k=>k.name===f.account);return `<div class="stat"><div class="row-name">${esc(f.name)}</div><div class="note">${[f.nums.length?'Card ending '+f.nums.join(', '):'',f.add+(f.add===1?' expense':' expenses'),f.ref?f.ref+(f.ref===1?' refund':' refunds'):'',f.mov?f.mov+' not counted as spending (transfers, income or investing)':'',f.link?f.link+' matched to expenses you entered by hand':'',f.dup?f.dup+' already imported':'',f.pay?f.pay+' card payments and rewards left out':''].filter(Boolean).join(' · ')}</div>
+     ${f.dupx?`<div class="banner warn" style="margin-top:8px"><span>${f.dupx} ${f.dupx===1?'charge is':'charges are'} already saved under ${esc(f.xAcc.join(' and '))}, so ${f.dupx===1?'it was':'they were'} skipped to avoid counting ${f.dupx===1?'it':'them'} twice. If ${f.dupx===1?'it belongs':'they belong'} to the account below, import ${f.dupx===1?'it':'them'} anyway, then remove the other copies with Find duplicates in Settings.</span><button class="link" data-act="imp-keepx" data-id="${i}">Import them anyway</button></div>`:''}
+     ${f.keepX?`<div class="note" style="margin-top:6px">Importing charges that also appear under another account. <button class="link" data-act="imp-keepx" data-id="${i}">Skip them again</button></div>`:''}
      ${f.own?'<div class="note" style="margin-top:6px">Uses the Account column in the file.</div>':`<div class="field" style="margin-top:8px"><label for="imp-acc-${i}">Account</label><select class="pick" style="width:100%" id="imp-acc-${i}" data-imp="${i}">${cards().map(k=>`<option${k.name===f.account?' selected':''}>${esc(k.name)}</option>`).join('')}<option value="__new"${!isCard&&f.mode!=='bank'?' selected':''}>New card…</option><option value="__newbank"${!isCard&&f.mode==='bank'?' selected':''}>New bank account…</option></select></div>
      ${isCard?'':`<div class="field" style="margin-top:8px"><label for="imp-new-${i}">Name for the new ${f.mode==='bank'?'bank account':'card'}</label><input class="input" id="imp-new-${i}" data-impnew="${i}" value="${esc(f.account)}" autocomplete="off"></div>`}`}</div>`}).join('')}
    ${st.bad.length?`<div class="banner" style="background:var(--bad-soft)">${st.bad.map(esc).join('<br>')}</div>`:''}
@@ -1285,8 +1352,17 @@ function cardSheet(id){
    <div><div class="label">Months without a statement</div>${miss.length?`<div class="rows">${miss.map(ym=>`<div class="row"><span class="row-main"><span class="row-name">${ymLabel(ym)}</span></span><button class="btn small" data-act="card-skip" data-id="${esc(c.id+'|'+ym)}">Not used</button></div>`).join('')}</div>
      ${miss.length>1?`<div class="btn-row" style="margin-top:10px"><button class="btn small" data-act="card-skipall" data-id="${esc(c.id)}">Mark all ${miss.length} as not used</button></div>`:''}`:'<div class="empty">Nothing is missing. This card is up to date.</div>'}</div>
    ${skipped.length?`<div><div class="label" style="margin-bottom:8px">Marked as not used. Tap to undo.</div><div class="chips">${skipped.map(ym=>`<button class="chip" data-act="card-unskip" data-id="${esc(c.id+'|'+ym)}">${ymLabel(ym)} ✕</button>`).join('')}</div></div>`:''}
+   ${(c.hints||[]).some(h=>h[0]==='#')?`<p class="note">Statements for card ending ${esc(c.hints.filter(h=>h[0]==='#').map(h=>h.slice(1)).join(', '))} go to this account automatically.</p>`:''}
    <div class="btn-row"><button class="btn small danger" data-act="card-del" data-id="${esc(c.id)}">Remove account</button></div>
    <p class="note">${n} entries use this account. Removing it stops the reminders and keeps the entries.</p>`);
+}
+function dupesSheet(){
+  const by=new Map();
+  for(const g of crossDupes()){const k=[...new Set(g.map(t=>t.acc))].sort().join('¦');(by.get(k)||by.set(k,[]).get(k)).push(g)}
+  openSheet(`${head('Possible duplicates')}<p class="note">These charges have the same date, amount and description under more than one account. That usually means one statement was imported under the wrong account. Keep the account they belong to, and Tally removes the copies from the other.</p>
+   ${by.size?[...by].map(([k,gs])=>{const accs=k.split('¦'),amt=gs.reduce((s,g)=>s+g[0].a,0);return `<section class="stat"><div class="row-name">${accs.map(esc).join(' and ')}</div><div class="note">${gs.length} ${gs.length===1?'charge appears':'charges appear'} under both · ${m2(amt)} counted twice</div>
+     <div class="rows">${gs.slice(0,6).map(g=>txRow(g[0],true)).join('')}</div>${gs.length>6?`<div class="note">and ${gs.length-6} more</div>`:''}
+     <div class="btn-row" style="margin-top:10px">${accs.map(x=>`<button class="btn small primary" data-act="dupe-keep" data-id="${esc(k+'§'+x)}">Keep under ${esc(x)}</button>`).join('')}</div></section>`}).join(''):'<div class="empty">No duplicates found.</div>'}`);
 }
 function rulesSheet(){
   const rs=S.rules.filter(r=>!r.x).sort((a,b)=>(a.name||a.match||a.has).localeCompare(b.name||b.match||b.has));
@@ -1369,9 +1445,10 @@ function restoreBackup(text){
   for(const k of j.cards||[]){const e=S.cards.find(x=>x.id===k.id)||S.cards.find(x=>!x.x&&!k.x&&x.name.toLowerCase()===String(k.name).toLowerCase());if(!e)S.cards.push(Object.assign({},k,{u:now}));else{if(e.id!==k.id)remap.set(k.id,e.id);if(e.x&&!k.x){e.x=0;e.u=now}}}
   for(const k0 of j.marks||[]){const cid=k0.id.slice(0,k0.id.lastIndexOf('|')),k=remap.has(cid)?Object.assign({},k0,{id:remap.get(cid)+k0.id.slice(cid.length)}):k0;const e=S.marks.find(x=>x.id===k.id);if(!e)S.marks.push(Object.assign({},k,{u:now}));else if(e.x&&!k.x)Object.assign(e,k,{u:now})}
   LIVE=null;normalizeAccounts();const keys=new Set(S.tx.filter(t=>!t.x&&t.k).map(t=>t.k));
+  const has=j.tx.filter(t=>!t.x).length;
   for(const t of j.tx){if(ids.has(t.id))continue;const c=matchCard(t.acc),k=c&&t.k&&t.acc!==c.name?t.k.replace(mkey(t.acc)+'|',mkey(c.name)+'|'):t.k;if(k&&!t.x&&keys.has(k))continue;S.tx.push(Object.assign({},t,{u:Math.max(t.u||0,1)}));n++}
   LIVE=null;normalizeAccounts();if(!(j.marks||[]).length)bootstrapMarks();
-  save();closeSheet();if(n||!live().length)initPeriod();if(n)VIEW='home';render();toast(n?`Restored ${n} entries`:nr?`Added ${nr} merchant rules`:'This backup was already loaded.');
+  save();closeSheet();if(n||!live().length)initPeriod();if(n)VIEW='home';render();toast(n?`Restored ${n} entries`:nr?`Added ${nr} merchant rules`:has?'Everything in this backup is already here.':'This backup has no expenses in it.');
 }
 function clearSample(quiet){S.tx=S.tx.filter(t=>t.src!=='sample');S.settings.sample=false;LIVE=null;if(!quiet){save();initPeriod();render()}}
 function loadSample(){
@@ -1421,6 +1498,11 @@ document.addEventListener('click',e=>{
     case 'f-save':saveForm();break;
     case 'f-del':{if(b.dataset.armed){const t=S.tx.find(x=>x.id===F.id);if(t){t.x=1;t.u=Date.now()}save();closeSheet();render();toast('Expense deleted')}else{b.dataset.armed=1;b.textContent='Tap again to delete'}break}
     case 'imp-go':commitImport();break;
+    case 'imp-keepx':{const p=STAGE&&STAGE.parsed[+id];if(!p)break;p.keepX=!p.keepX;STAGE=Object.assign(stage(STAGE.parsed),{bad:STAGE.bad});importSheet();break}
+    case 'dupes':dupesSheet();break;
+    case 'dupe-keep':{const i=id.lastIndexOf('§'),k=id.slice(0,i),keep=id.slice(i+1);let n=0;
+      for(const g of crossDupes()){if([...new Set(g.map(t=>t.acc))].sort().join('¦')!==k)continue;for(const t of g)if(t.acc!==keep){t.x=1;t.u=Date.now();n++}}
+      LIVE=null;save();dupesSheet();render();toast(`Removed ${n} ${n===1?'copy':'copies'}. Kept ${keep}.`);break}
     case 'cats':catsSheet();break;
     case 'rules':rulesSheet();break;
     case 'cat-edit':catEditSheet(id);break;
@@ -1453,7 +1535,7 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('input',e=>{
   if(e.target.id==='act-q'){ACT.q=e.target.value;ACT.limit=120;$('#act-list').innerHTML=activityList(period())}
-  if(e.target.id==='f-a')e.target.style.width=Math.max(4.2,e.target.value.length+.6)+'ch';
+  if(e.target.id==='f-a')sizeAmount();
   if(e.target.id==='f-m'){clearTimeout(suggestFromMerchant.t);suggestFromMerchant.t=setTimeout(suggestFromMerchant,350)}
 });
 document.addEventListener('change',e=>{
@@ -1487,7 +1569,7 @@ load();
 if(window.Chart){Chart.defaults.font.family=css('--font');Chart.defaults.font.size=11.5;Chart.defaults.color=css('--fg2')}
 render();
 if(S.settings.syncUrl)sync();
-window.TALLY={handleFiles,parseFile,stage,get S(){return S},backup:()=>JSON.stringify({app:'tally',v:1,tx:S.tx,cats:S.cats,rules:S.rules,cards:S.cards,marks:S.marks}),reminders,missing,flow,betweenAll,
+window.TALLY={handleFiles,parseFile,stage,get S(){return S},backup:()=>JSON.stringify({app:'tally',v:1,tx:S.tx,cats:S.cats,rules:S.rules,cards:S.cards,marks:S.marks}),reminders,missing,flow,betweenAll,crossDupes,
   addRules(list){for(const r of list){const id='h-'+slug(r.has);if(S.rules.some(x=>x.id===id))continue;S.rules.push({id,has:mkey(r.has),name:r.name||'',c:r.c,s:r.sub?r.c+'/'+slug(r.sub):null,u:Date.now()})}saveLocal()},
   addCards(list){for(const [n,t,id] of list){const k=addCard(n,t);if(id)k.id=id}saveLocal()}};
 
